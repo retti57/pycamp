@@ -8,7 +8,8 @@ from dotenv import load_dotenv
 
 
 class EmailSenderManager:
-    """Email sender class. Responsible for """
+    """Email sender class. Has methods send() to send email message, and message() to create such one.
+    This method does not support any attachments to message"""
 
     def __init__(self):
         self.port = None
