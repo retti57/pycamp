@@ -67,8 +67,9 @@ class DataBaseController:
     def clear_db(self):
         session = self.create_connection()
 
-        for book in session.execute(select(LentBook)).all():
-            stmt = delete(book)
+        for book in session.query(LentBook).all():
+            book_id_to_delete = book.id
+            stmt = delete(LentBook).where(book.id == book_id_to_delete)
             session.execute(stmt)
         session.commit()
 
