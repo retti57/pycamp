@@ -17,14 +17,6 @@ class EmailSenderManager:
         self.receiver = None
         self.host = None
         self.context = ssl.create_default_context()
-        # cwd = os.getcwd()
-        #
-        # if os.path.exists(cwd+r'\.env'):
-        #     load_dotenv()
-        #     sender_env = str(getenv('NOTIFICATIONS_EMAIL_ADDRESS'))
-        #     self.setup(sender=sender_env, email_receiver='docz9856@wp.pl')
-        # else:
-        #     self.setup(sender='notificationsmail87@gmail.com', email_receiver='docz9856@wp.pl')
 
     def setup(self, email_receiver: str, sender: str):
         """
@@ -86,18 +78,18 @@ class EmailSenderManager:
         # Hi,
         # How are you?
         # When will you return my book?"""
-        html = """\
+        html = f"""\
         <html>
             <body>
-                <p>Siemka,{}<br>
-                    Pamiętasz, że pożyczałeś ode mnie książkę "{}"?<br>
-                    W dniu {} umówiliśmy się, że oddasz mi dzisiaj.<br>
+                <p>Siemka,{receiver_name}<br>
+                    Pamiętasz, że pożyczałeś ode mnie książkę "{receiver_book}"?<br>
+                    W dniu {receiver_lent_date} umówiliśmy się, że oddasz mi dzisiaj.<br>
                     Czekam na kontakt w tej sprawie :)
                     Trzymaj się!
                 </p>
             </body>
         </html>
-        """.format(receiver_name, receiver_book, receiver_lent_date)
+        """
 
         # Turn these into plain/html MIMEText objects
         # part1 = MIMEText(text, "plain")
@@ -109,9 +101,3 @@ class EmailSenderManager:
         message.attach(part2)
 
         return message
-
-
-if __name__ == '__main__':
-    emm = EmailSenderManager()
-    message = emm.message("NAME", "BOOK", "LENT_DATE")
-    emm.send(message)
