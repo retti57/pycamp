@@ -17,31 +17,38 @@ class EmailSenderManager:
         self.receiver = None
         self.host = None
         self.context = ssl.create_default_context()
-        cwd = os.getcwd()
+        # cwd = os.getcwd()
+        #
+        # if os.path.exists(cwd+r'\.env'):
+        #     load_dotenv()
+        #     sender_env = str(getenv('NOTIFICATIONS_EMAIL_ADDRESS'))
+        #     self.setup(sender=sender_env, email_receiver='docz9856@wp.pl')
+        # else:
+        #     self.setup(sender='notificationsmail87@gmail.com', email_receiver='docz9856@wp.pl')
 
-        if os.path.exists(cwd+r'\.env'):
-            load_dotenv()
-            sender_env = str(getenv('NOTIFICATIONS_EMAIL_ADDRESS'))
-            self._setup(sender=sender_env)
-        else:
-            self._setup(sender='notificationsmail87@gmail.com')
-
-    def _setup(self, sender: str, receiver: str = 'docz9856@wp.pl'):
+    def setup(self, email_receiver: str, sender: str):
         """
         Settings for email, defining addresses for sender and receiver.
         For convenient use, you should set new environmental variable, for example:
             >NOTIFICATIONS_EMAIL_ADDRESS=''<
             >NOTIFICATIONS_EMAIL_PASSWORD=<
         :param sender: default address:  notificationsmail87@gmail.com set as environmental variable
-        :param receiver: default address:  docz9856@wp.pl
+        :param email_receiver: default address:  docz9856@wp.pl
 
         :return: None
         """
+        cwd = os.getcwd()
+
+        if os.path.exists(cwd + r'\.env'):
+            load_dotenv()
+            sender_env = str(getenv('NOTIFICATIONS_EMAIL_ADDRESS'))
+            self.sender = sender_env
+        else:
+            self.sender = sender.strip()
         self.port = 465
-        self.sender = sender.strip()
-        self.receiver = receiver.strip()
+        self.receiver = email_receiver.strip()
         try:
-            if '@' in receiver and len(receiver) >= 5:
+            if '@' in email_receiver and len(email_receiver) >= 5:
                 address, domain = sender.split('@')
                 self.host = "smtp.{}".format(domain)
             else:
@@ -66,7 +73,7 @@ class EmailSenderManager:
 
         return None
 
-    def message(self):
+    def message(self, receiver_name, receiver_book, receiver_lent_date):
         """Create a message to send
         :return: message object of MIMEMultipart type"""
         message = MIMEMultipart("alternative")
@@ -75,28 +82,30 @@ class EmailSenderManager:
         message["To"] = self.receiver
 
         # Create the plain-text and HTML version of your message
-        text = """\
-        Hi,
-        How are you?
-        When will you return my book?"""
+        # text = """\
+        # Hi,
+        # How are you?
+        # When will you return my book?"""
         html = """\
         <html>
             <body>
-                <p>Siemka,<br>
-                    Co u Ciebie?<br>
-                    Kiedy oddasz mi książkę?
+                <p>Siemka,{}<br>
+                    Pamiętasz, że pożyczałeś ode mnie książkę "{}"?<br>
+                    W dniu {} umówiliśmy się, że oddasz mi dzisiaj.<br>
+                    Czekam na kontakt w tej sprawie :)
+                    Trzymaj się!
                 </p>
             </body>
         </html>
-        """
+        """.format(receiver_name, receiver_book, receiver_lent_date)
 
         # Turn these into plain/html MIMEText objects
-        part1 = MIMEText(text, "plain")
+        # part1 = MIMEText(text, "plain")
         part2 = MIMEText(html, "html")
 
         # Add HTML/plain-text parts to MIMEMultipart message
         # The email client will try to render the last part first
-        message.attach(part1)
+        # message.attach(part1)
         message.attach(part2)
 
         return message
@@ -104,5 +113,5 @@ class EmailSenderManager:
 
 if __name__ == '__main__':
     emm = EmailSenderManager()
-    message = emm.message()
+    message = emm.message("NAME", "BOOK", "LENT_DATE")
     emm.send(message)
