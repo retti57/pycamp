@@ -1,5 +1,5 @@
 from sys import argv
-from sqlalchemy import create_engine, Column, Integer, String, select, Date, delete
+from sqlalchemy import create_engine, Column, Integer, String, select, Date, delete, update
 from sqlalchemy.orm import sessionmaker, declarative_base
 from datetime import datetime, date
 
@@ -13,7 +13,6 @@ class LentBook(Base):
     name = Column(String, nullable=False)
     book_title = Column(String, nullable=False)
     lent_at = Column(Date, nullable=False, default=date.today())
-    # lent_at = Column(Date, nullable=False, default=func.now())
     return_at = Column(Date, nullable=False)
 
 
@@ -46,8 +45,7 @@ class DataBaseController:
     def get_all(self):
         session = self.create_connection()
 
-        all_lent_books = session.query(LentBook).all()
-        return all_lent_books
+        return session.query(LentBook).all()
 
     def date_check(self):
         today = datetime.today().date()
@@ -71,6 +69,13 @@ class DataBaseController:
             book_id_to_delete = book.id
             stmt = delete(LentBook).where(book.id == book_id_to_delete)
             session.execute(stmt)
+        session.commit()
+
+    def update_db(self, condition_date, new_date):
+        session = self.create_connection()
+
+        stmt = update(LentBook).where(LentBook.return_at == condition_date).values(return_at=new_date)
+        session.execute(stmt)
         session.commit()
 
 
@@ -103,8 +108,16 @@ if __name__ == '__main__':
         dbc = DataBaseController()
         dbc.clear_db()
 
+    elif len(argv) == 4 and argv[1] == 'update':
+        dbc = DataBaseController()
+        new_date = datetime.strptime(argv[3], "%Y-%m-%d").date()
+        condition_date = datetime.strptime(argv[2], "%Y-%m-%d").date()
+        dbc.update_db(condition_date, new_date)
+
     else:
         dbc = DataBaseController()
         dbc.date_check()
+
+
 
 
