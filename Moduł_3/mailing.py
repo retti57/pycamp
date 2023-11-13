@@ -37,7 +37,7 @@ class EmailSenderManager:
             self.sender = sender_env
         else:
             self.sender = sender.strip()
-        self.port = 465
+        self.port = getenv('PORT')
         self.receiver = email_receiver.strip()
         try:
             if '@' in email_receiver and len(email_receiver) >= 5:
