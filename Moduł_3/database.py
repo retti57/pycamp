@@ -1,7 +1,7 @@
 from sqlalchemy import create_engine, Column, Integer, String, select, Date, delete, update
 from sqlalchemy.orm import sessionmaker, declarative_base
 from datetime import datetime, date
-import mailing
+from collections import namedtuple
 
 Base = declarative_base()  # model klasy obieków
 
@@ -46,29 +46,31 @@ class DataBaseController:
 
         return session.query(LentBook).all()
 
-    def send_mail_when_event_day(self):
-        today = datetime.today().date()
+    def check_when_event_day(self, event_date):
         session = self.create_connection()
 
         books_to_return = session.execute(
-            select(LentBook).where(LentBook.return_at <= today))
-
+            select(LentBook).where(LentBook.return_at <= event_date)
+        )
         books_to_be_returned = books_to_return.scalars()
-        for lent_book in books_to_be_returned:
-            receiver = lent_book.email
-            name = lent_book.name
-            title = lent_book.book_title
-            lent_date = lent_book.lent_at
-            print(f"""
-                    Who lent book: {name}
-                    Email: {receiver},
-                    Book Title: {title},
-                    Lent At: {lent_date}""")
 
-            emm = mailing.EmailSenderManager()
-            emm.setup(email_receiver=receiver, sender='notificationsmail87@gmail.com')
-            msg = emm.message(name, title, lent_date)
-            emm.send(msg)
+        receivers = []
+        Receiver = namedtuple('Receiver', 'name email lent_book lent_date')
+        for lent_book in books_to_be_returned:
+            receiver = Receiver(
+                lent_book.name,
+                lent_book.email,
+                lent_book.book_title,
+                lent_book.lent_at.strftime('%Y-%m-%d')
+            )
+            receivers.append(receiver)
+            print(f"""
+                    Who lent book: {receiver.name}
+                    Email: {receiver.email},
+                    Book Title: {receiver.lent_book},
+                    Lent At: {receiver.lent_date}""")
+
+        return receivers
 
     def clear_db(self):
         session = self.create_connection()
