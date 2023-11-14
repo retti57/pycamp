@@ -1,7 +1,7 @@
 from datetime import datetime
 from sys import argv
 from database import DataBaseController
-
+from mailing import EmailSenderManager
 
 if __name__ == '__main__':
     if len(argv) == 2 and argv[1] == 'create-db':
@@ -46,4 +46,17 @@ if __name__ == '__main__':
 
     else:
         dbc = DataBaseController()
-        dbc.send_mail_when_event_day()
+        today = datetime.today().date()
+        receivers = dbc.check_when_event_day(today)
+        print('receivers: ', receivers)
+        with EmailSenderManager(ssl_enable=True) as manager:
+            for receiver in receivers:
+                msg = manager.create_message(
+                    receiver.name,
+                    receiver.email,
+                    receiver.lent_book,
+                    receiver.lent_date
+                )
+
+                print(receiver.lent_date)
+                manager.send_mail(receiver, msg)
