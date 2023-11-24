@@ -1,34 +1,36 @@
-from pynput.mouse import Button, Controller
 import time
-from keyboard_control import keyboard_typing_sentence, one_press_cmd_button, one_press_2_buttons, one_press_enter_button
+from keyboard_class import MyKeyboard
+from mouse_class import MyMouse
+from json import load
 
 
 if __name__ == '__main__':
-    # open start-menu
-    one_press_cmd_button()
-    time.sleep(1.5)
-    # type-in 'spotify' in search tool-bar
-    keyboard_typing_sentence('spotify')
-    time.sleep(1.5)
+    with open('actions.json') as file:
+        actions = load(file)
+        m = actions[0]
+        k = actions[1]
+        print(m["steps"])
+        # open start-menu
+        keyboard = MyKeyboard()
+        keyboard.one_press_button("cmd", 2)
+        # type-in 'spotify' in search tool-bar
+        keyboard.type_sentence('spotify',0.25)
 
-    one_press_enter_button()
-    time.sleep(4)
+        keyboard.one_press_button("enter", 5)
 
-    # press simultanously ctrl + L to open search tool-bar in spotify
-    one_press_2_buttons()
-    time.sleep(4)
+        # press simultanously ctrl + L to open search tool-bar in spotify
+        keyboard.one_press_2_buttons('ctrl_l', 'l',4)
 
-    # type-in 'seether' in search tool-bar
-    keyboard_typing_sentence('seether')
-    time.sleep(4)
-    # wait until searching end and hit enter button
-    one_press_enter_button()
-    time.sleep(3)
+        # type-in 'seether' in search tool-bar
+        keyboard.type_sentence('nirvana',0.45)
 
-    # move mouse pointer to play icon
-    mouse_controller = Controller()
-    mouse_controller.position = (800, 432)
-    time.sleep(1.5)
+        # wait until searching end and hit enter button
+        keyboard.one_press_button('enter',4)
 
-    mouse_controller.press(Button.left)
-    mouse_controller.release(Button.left)
+        time.sleep(1)
+
+        # move mouse pointer to play icon
+        mouse_controller = MyMouse()
+        time.sleep(1.5)
+        mouse_controller.set_pointer(800, 432)
+        mouse_controller.click_button(mouse_controller.right_button, 1)

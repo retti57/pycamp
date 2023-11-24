@@ -7,30 +7,24 @@ class MyKeyboard:
     def __init__(self):
         self.controller = Controller()
 
+    @staticmethod
+    def _get_val(button_str):
+        return getattr(Key, button_str)
+
     def type_sentence(self, sentence, sleep_time):
         for letter in sentence:
             time.sleep(sleep_time)
             self.controller.type(letter)
 
-    def one_press_cmd_button(self, sleep_time):
-        self.controller.tap(Key.cmd)
+    def one_press_button(self, key, sleep_time):
+        self.controller.tap(self._get_val(key))
         time.sleep(sleep_time)
 
     def one_press_2_buttons(self, spec_key, norm_key, sleep_time):
-        kbrd_special_keys = {'ctrl': Key.ctrl, 'alt': Key.alt, 'cmd': Key.cmd_l, 'enter': Key.enter}
-        if spec_key in kbrd_special_keys.keys():
-            # with keyboard.pressed(kbrd_special_keys[spec_key]):
-            #     keyboard.release(norm_key)
-            self.controller.press(kbrd_special_keys[spec_key])
-            self.controller.press(norm_key)
-            self.controller.release(kbrd_special_keys[spec_key])
-            self.controller.release(norm_key)
+
+        self.controller.press(self._get_val(spec_key))
+        self.controller.tap(norm_key)
+        self.controller.release(self._get_val(spec_key))
+
         time.sleep(sleep_time)
-
-    def one_press_enter_button(self, sleep_time):
-        self.controller.tap(Key.enter)
-        time.sleep(sleep_time)
-
-
-
 
