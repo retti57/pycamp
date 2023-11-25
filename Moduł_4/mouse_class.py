@@ -1,3 +1,4 @@
+from time import sleep
 from pynput import mouse
 
 
@@ -12,6 +13,7 @@ class MyMouse:
         self.controller.position = (pos_x, pos_y)
 
     def click_button(self, button, clicks=1):
+        sleep(1.5)
         match button:
             case 'left':
                 self.controller.click(self.left_button, clicks)
@@ -39,3 +41,5 @@ def on_scroll(x, y, dx, dy):
     print('Scrolled {0} at {1}'.format(
         'down' if dy < 0 else 'up',
         (x, y)))
+
+
