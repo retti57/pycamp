@@ -4,7 +4,7 @@
     "controller": "keyboard",
     "one_press_button": {
       "key": "cmd",
-      "sleep_time": 1.5
+      "sleep_time": 0.5
     }
   }
 ,
@@ -13,41 +13,41 @@
     "controller": "keyboard",
     "type_sentence": {
       "sentence": "spotify",
-      "sleep_time": 1
+      "sleep_time": 0.16
     }
   },
   {
     "step": 3,
     "controller": "keyboard",
-    "one_press_2_buttons": {
-      "spec_key": "cmd",
-      "norm_key": "up",
-      "sleep_time": 0.05
+    "one_press_button": {
+      "key": "enter",
+      "sleep_time": 2.5
     }
   },
   {
     "step": 4,
     "controller": "keyboard",
-    "one_press_button": {
-      "key": "enter",
-      "sleep_time": 5
+    "one_press_2_buttons": {
+      "spec_key": "ctrl",
+      "norm_key": "l",
+      "sleep_time": 0.75
     }
   },
   {
     "step": 5,
     "controller": "keyboard",
     "one_press_2_buttons": {
-      "spec_key": "ctrl",
-      "norm_key": "l",
-      "sleep_time": 4
-      }
-    },
+      "spec_key": "cmd",
+      "norm_key": "up",
+      "sleep_time": 3
+    }
+  },
   {
     "step": 6,
     "controller": "keyboard",
     "type_sentence": {
-      "sentence": "gojira",
-      "sleep_time": 1.5
+      "sentence": "adagio for strings tiesto",
+      "sleep_time": 0.15
     }
   },
   {

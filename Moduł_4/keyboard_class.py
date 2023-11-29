@@ -17,18 +17,23 @@ class MyKeyboard:
             self.controller.type(letter)
 
     def one_press_button(self, key, sleep_time):
+        time.sleep(0.7)
         try:
             self.controller.tap(self._get_value(key))
+            print(self._get_value(key))
         except AttributeError:
             self.controller.tap(key)
         finally:
             time.sleep(sleep_time)
 
     def one_press_2_buttons(self, spec_key, norm_key, sleep_time):
+        time.sleep(0.7)
         try:
             self.controller.press(self._get_value(spec_key))
             self.controller.tap(self._get_value(norm_key))
             self.controller.release(self._get_value(spec_key))
+            print(self._get_value(spec_key))
+            print(self._get_value(norm_key))
 
         except AttributeError:
             self.controller.tap(norm_key)

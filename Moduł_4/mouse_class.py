@@ -13,7 +13,7 @@ class MyMouse:
         self.controller.position = (pos_x, pos_y)
 
     def click_button(self, button, clicks=1):
-        sleep(1.5)
+        sleep(2.0)
         match button:
             case 'left':
                 self.controller.click(self.left_button, clicks)
