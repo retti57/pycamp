@@ -43,23 +43,20 @@ class Parser:
         )
 
         # self.action_group = self.parser.add_mutually_exclusive_group(required=True)
+    def pass_validator(self, value: str):
+        if value.startswith('a'):
+            raise argparse.ArgumentError
+        return value
 
 
 class ExampleParser:
     def __init__(self):
         self.parser = argparse.ArgumentParser()
-        self.parser.add_argument(
-            '-c','--choice',
-            choices=[1, 2],
-            type=int
-        )
-        self.parser.add_argument(
-            '-n', '--number',
-            action='append',
-            help='stores number',
-            #
-            type=int
-        )
+        self.parser.add_argument('--create')
+        self.parser.add_argument('--add-book')
+        self.parser.add_argument('--show-books')
+        self.parser.add_argument('--clear')
+        self.parser.add_argument('--update', choices=['lent', 'return'])
 
         self.second_group = self.parser.add_mutually_exclusive_group(required=False)
         self.second_group.add_argument(
@@ -71,7 +68,6 @@ class ExampleParser:
         self.second_group.add_argument(
             '-v',
             '--verbose',
-
             help='getting more talkative information',
             action='store_true',
             default=0
@@ -81,15 +77,11 @@ class ExampleParser:
         return self.parser.parse_args()
 
 
-def pass_validator(value: str):
-    if value.startswith('a'):
-        raise argparse.ArgumentError
-    return value
+if __name__ == '__main__':
 
+    parser = ExampleParser()
+    args = parser.parse_args()
+    if args.create == 1:
+        print(args)
 
-parser = ExampleParser()
-
-args = parser.parse_args()
-
-
-print(args)
+still working on ....
