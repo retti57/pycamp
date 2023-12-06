@@ -41,10 +41,43 @@ class DataBaseController:
         session.add(new_lent_book)
         session.commit()
 
-    def get_all(self):
+    def get_all(self) -> list:
         session = self.create_connection()
 
         return session.query(LentBook).all()
+
+    def get_by_query(self, query_key: str):
+        session = self.create_connection()
+        columns = {
+            'name': LentBook.name,
+            'email': LentBook.email,
+            'return_at': LentBook.return_at,
+            'lent_at': LentBook.lent_at,
+            'book_title': LentBook.book_title
+        }
+        query, value = query_key.split('=')
+        if query not in columns.keys():
+            raise ValueError("Wrong kwargs. The given query must be a name of column")
+        else:
+            books_to_return = session.execute(
+                select(LentBook).where(columns.get(query) == value)
+            )
+            books_to_be_returned = books_to_return.scalars()
+
+            receivers = []
+            Receiver = namedtuple('Receiver', 'id name email book_title lent_at return_at')
+            for lent_book in books_to_be_returned:
+                receiver = Receiver(
+                    lent_book.id,
+                    lent_book.name,
+                    lent_book.email,
+                    lent_book.book_title,
+                    lent_book.lent_at.strftime('%Y-%m-%d'),
+                    lent_book.return_at.strftime('%Y-%m-%d')
+                )
+                receivers.append(receiver)
+
+            return receivers
 
     def check_when_event_day(self, event_date):
         session = self.create_connection()
@@ -55,20 +88,22 @@ class DataBaseController:
         books_to_be_returned = books_to_return.scalars()
 
         receivers = []
-        Receiver = namedtuple('Receiver', 'name email lent_book lent_date')
+        Receiver = namedtuple('Receiver', 'id name email book_title lent_at return_at')
         for lent_book in books_to_be_returned:
             receiver = Receiver(
+                lent_book.id,
                 lent_book.name,
                 lent_book.email,
                 lent_book.book_title,
-                lent_book.lent_at.strftime('%Y-%m-%d')
+                lent_book.lent_at.strftime('%Y-%m-%d'),
+                lent_book.return_at.strftime('%Y-%m-%d')
             )
             receivers.append(receiver)
             print(f"""
                     Who lent book: {receiver.name}
                     Email: {receiver.email},
-                    Book Title: {receiver.lent_book},
-                    Lent At: {receiver.lent_date}""")
+                    Book Title: {receiver.book_title},
+                    Lent At: {receiver.lent_at}""")
 
         return receivers
 
