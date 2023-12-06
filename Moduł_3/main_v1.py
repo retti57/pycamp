@@ -54,7 +54,7 @@ if __name__ == '__main__':
                 msg = manager.create_message(
                     receiver.name,
                     receiver.email,
-                    receiver.lent_book,
+                    receiver.book_title,
                     receiver.lent_date
                 )
 
