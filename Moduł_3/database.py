@@ -48,7 +48,7 @@ class DataBaseController:
 
     def get_by_query(self, query_key: str):
         session = self.create_connection()
-        columns = {
+        _columns = {
             'name': LentBook.name,
             'email': LentBook.email,
             'return_at': LentBook.return_at,
@@ -56,11 +56,11 @@ class DataBaseController:
             'book_title': LentBook.book_title
         }
         query, value = query_key.split('=')
-        if query not in columns.keys():
+        if query not in _columns.keys():
             raise ValueError("Wrong kwargs. The given query must be a name of column")
         else:
             books_to_return = session.execute(
-                select(LentBook).where(columns.get(query) == value)
+                select(LentBook).where(_columns.get(query) == value)
             )
             books_to_be_returned = books_to_return.scalars()
 
@@ -129,3 +129,23 @@ class DataBaseController:
         stmt = update(LentBook).where(LentBook.return_at == cond_date).values(return_at=newdate)
         session.execute(stmt)
         session.commit()
+
+    def update_db_by_id_with_query(self, the_id, query_key: str):
+        session = self.create_connection()
+        _columns = {
+            'name': LentBook.name,
+            'email': LentBook.email,
+            'return_at': LentBook.return_at,
+            'lent_at': LentBook.lent_at,
+            'book_title': LentBook.book_title
+        }
+        query, value = query_key.split('=')
+
+        if query not in _columns.keys():
+            raise ValueError("Wrong kwargs. The given query must be a name of column")
+        else:
+
+            stmt = update(LentBook).where(LentBook.id == int(the_id)).values(_columns.get(query) == value)
+            session.execute(stmt)
+            session.commit()
+
