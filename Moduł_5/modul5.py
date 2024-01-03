@@ -1,11 +1,13 @@
 from os import walk
-import pathlib, getpass, argparse
+import pathlib
+import getpass
+import argparse
 from argparse import Namespace, ArgumentParser,  RawTextHelpFormatter
-from time import time, sleep
+from time import time
 from typing import Any, Sequence
 from tqdm import tqdm
-from crypto import Encryption, Decryption, Append
 from cryptography.fernet import InvalidToken
+from crypto import Encryption, Decryption, Append
 
 
 class Password(argparse.Action):
@@ -44,27 +46,36 @@ def main(args: Namespace):
         if args.verbose >= 3:
             files_to_process = tqdm(files_to_process)
 
+        actions = []
+
         for file in files_to_process:
-            sleep(.2)
+
             before = time()
             path = pathlib.Path(file)
             if args.mode == 'encrypt':
-                action = Encryption(path)
+                action = Encryption(path, args.password)
             elif args.mode == 'decrypt':
-                action = Decryption(path)
+                action = Decryption(path, args.password)
             elif args.mode == 'append':
                 text = input('\nWhat to append?: ')
-                action = Append(path, text)
-            action.execute(args.password)
+                action = Append(path, args.password, text)
+            actions.append(action)
+
             after = time()
+
             if 0 < args.verbose <= 2:
                 print(file, end=' ')
                 if args.verbose > 1:
                     print(after-before)
-                print()
 
             if args.verbose >= 3:
                 files_to_process.set_description(file)
+
+        for action in actions:
+            action.start()
+
+        for action in actions:
+            action.join()
 
     except InvalidToken:
         print('Invalid password')

@@ -1,6 +1,6 @@
 import base64
 import pathlib
-
+from threading import Thread
 from load_salt import load_salt_from_env
 from cryptography.fernet import Fernet
 from cryptography.hazmat.primitives import hashes
@@ -11,8 +11,9 @@ class EncryptDecrypt:
     """ Common data and function for encryption or decryption of file"""
     verbosity = None
 
-    def __init__(self, path: pathlib.Path):
+    def __init__(self, path: pathlib.Path, password: str):
         self.path = path
+        self.password = password
 
     @staticmethod
     def create_key(password: str) -> bytes:
@@ -27,25 +28,34 @@ class EncryptDecrypt:
         return key
 
 
-class Decryption(EncryptDecrypt):
-    def execute(self, password):
+class Decryption(EncryptDecrypt, Thread):
+    def __init__(self, path, password):
+        self.password = password
+        EncryptDecrypt.__init__(self, path=path, password=password)
+        Thread.__init__(self)
+
+    def run(self):
         with open(self.path, 'r') as file:
             data_to_decrypt = file.read()
 
-        fernet = Fernet(self.create_key(password))
+        fernet = Fernet(self.create_key(self.password))
         decrypted_content = fernet.decrypt(data_to_decrypt.encode('utf8'))
 
         with open(self.path.rename(self.path.with_suffix('.txt')), 'w') as file:
             file.write(decrypted_content.decode('utf8'))
 
 
-class Encryption(EncryptDecrypt):
+class Encryption(EncryptDecrypt, Thread):
+    def __init__(self, path, password):
+        self.password = password
+        EncryptDecrypt.__init__(self, path=path, password=password)
+        Thread.__init__(self)
 
-    def execute(self, password):
+    def run(self):
         with open(self.path, 'r') as file:
             data_to_encrypt = file.read()
 
-        fernet = Fernet(self.create_key(password))
+        fernet = Fernet(self.create_key(self.password))
         encrypted_content = fernet.encrypt(data_to_encrypt.encode('utf8'))
 
         with open(self.path.rename(self.path.with_suffix('.dokodu')), 'w') as file:
@@ -53,9 +63,9 @@ class Encryption(EncryptDecrypt):
 
 
 class Append(EncryptDecrypt):
-    def __init__(self, path: pathlib.Path, text):
+    def __init__(self, path: pathlib.Path, password, text):
         self.text = text
-        super().__init__(path)
+        super().__init__(path, password)
 
     def execute(self, password):
         with open(self.path, 'r') as file:
